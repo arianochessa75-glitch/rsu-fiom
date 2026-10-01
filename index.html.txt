@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSU FIOM - Reparto Cilindri</title>
+    <style>
+        :root {
+            --primary: #c91c1c;
+            --primary-dark: #9e1313;
+            --dark: #1e1e1e;
+            --light: #f9f9f9;
+            --gray: #e0e0e0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        nav {
+            background: var(--dark);
+            color: white;
+            padding: 0.8rem;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: var(--primary);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 5px; color: var(--primary-dark); }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        
+        /* Area Upload PDF */
+        .drop-zone {
+            border: 2px dashed var(--primary);
+            padding: 30px;
+            text-align: center;
+            background: #fff5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .drop-zone:hover { background: #ffe8e8; }
+        
+        /* Calcolatore Giorni Lavorativi */
+        .calc-box {
+            background: #f1f3f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .calc-box input, .calc-box select {
+            padding: 8px;
+            margin: 5px 0 15px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+        }
+        .result-box {
+            background: #e6fcf5;
+            border: 1px solid #96f2d7;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            color: #0b7285;
+        }
+        .result-box ul {
+            margin: 10px 0 0 20px;
+            padding: 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--dark);
+            color: white;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>RSU FIOM - Reparto Cilindri</h1>
+    <p>Non ci avrete mai come volete voi</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#documenti">Documenti & PDF</a>
+    <a href="#calendario">Calendario & Festività</a>
+    <a href="#bacheca">Bacheca</a>
+</nav>
+
+<div class="container" id="home">
+    <h2>Benvenuti nella Area Sindacale</h2>
+    <p>Il sindacato dei metalmeccanici in prima linea ogni giorno nei reparti per difendere l'occupazione, la sicurezza, i salari e i diritti di ogni lavoratrice e lavoratore.</p>
+</div>
+
+<!-- SEZIONE DOCUMENTI & PDF -->
+<div class="container" id="documenti">
+    <h2>Documenti e Volantini PDF</h2>
+    <p>Carica un file PDF dal tuo dispositivo o trascinalo qui per visualizzarlo o scaricarlo immediatamente senza errori di percorso.</p>
+    
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <p>📂 <strong>Clicca qui o trascina un file PDF</strong></p>
+        <input type="file" id="fileInput" accept="application/pdf" style="display: none;" onchange="handleFileSelect(this.files)">
+    </div>
+
+    <div id="pdfViewerContainer" style="display:none; margin-top: 20px;">
+        <h3>File Pronto:</h3>
+        <p id="fileNameDisplay"></p>
+        <a id="openPdfBtn" href="#" target="_blank" class="btn">Apri / Visualizza PDF</a>
+        <a id="downloadPdfBtn" href="#" download class="btn" style="background: #333;">Scarica PDF</a>
+    </div>
+</div>
+
+<!-- SEZIONE CALENDARIO & CALCOLATORE CON FESTIVITA' CONTRATTUALI -->
+<div class="container" id="calendario">
+    <h2>Calendario Lavorativo & Festività Contrattuali (CCNL)</h2>
+    <p>Calcola i giorni lavorativi effettivi e verifica le festività nazionali e retribuite (incluse le ex-festività e i trattamenti per festività coincidenti con la domenica come da contratto).</p>
+    
+    <div class="calc-box">
+        <label for="startDate">Data Inizio:</label>
+        <input type="date" id="startDate">
+        
+        <label for="endDate">Data Fine:</label>
+        <input type="date" id="endDate">
+        
+        <button class="btn" onclick="calculateWorkingDays()">Calcola Giorni e Festività</button>
+        
+        <div id="calcResult" class="result-box" style="display: none;"></div>
+    </div>
+</div>
+
+<div class="container" id="bacheca">
+    <h2>Bacheca Sindacale & News</h2>
+    <ul>
+        <li><strong>28 Settembre 2026:</strong> Convocazione Assemblea Sindacale retribuita in reparto.</li>
+        <li><strong>15 Settembre 2026:</strong> Aggiornamento Permessi e Sicurezza - Gestione ex-festività.</li>
+        <li><strong>01 Settembre 2026:</strong> Volantino RSU: Obiettivi e Risultati del trimestre.</li>
+    </ul>
+</div>
+
+<footer>
+    <p>RSU FIOM - Reparto Cilindri &copy; 2026</p>
+</footer>
+
+<script>
+    // Gestione sicura dei PDF tramite Blob locale
+    function handleFileSelect(files) {
+        if (files.length === 0) return;
+        const file = files[0];
+        
+        if (file.type !== "application/pdf") {
+            alert("Per favore seleziona un file in formato PDF valido.");
+            return;
+        }
+
+        const fileURL = URL.createObjectURL(file);
+        
+        document.getElementById('fileNameDisplay').innerText = file.name;
+        const openBtn = document.getElementById('openPdfBtn');
+        const downloadBtn = document.getElementById('downloadPdfBtn');
+        
+        openBtn.href = fileURL;
+        downloadBtn.href = fileURL;
+        downloadBtn.download = file.name;
+        
+        document.getElementById('pdfViewerContainer').style.display = 'block';
+    }
+
+    // Drag and drop handler
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.background = '#ffe0e0'; });
+    dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.background = '#fff5f5'; });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.background = '#fff5f5';
+        if (e.dataTransfer.files.length > 0) {
+            handleFileSelect(e.dataTransfer.files);
+        }
+    });
+
+    // Calcolatore Giorni Lavorativi con Festività Nazionali e CCNL
+    function calculateWorkingDays() {
+        const startStr = document.getElementById('startDate').value;
+        const endStr = document.getElementById('endDate').value;
+        
+        if (!startStr || !endStr) {
+            alert("Inserisci sia la data di inizio che la data di fine.");
+            return;
+        }
+
+        let startDate = new Date(startStr);
+        let endDate = new Date(endStr);
+
+        if (startDate > endDate) {
+            alert("La data di inizio deve essere precedente o uguale alla data di fine.");
+            return;
+        }
+
+        let workingDays = 0;
+        let holidaysFound = [];
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+            let dayOfWeek = currentDate.getDay(); // 0 = Domenica, 6 = Sabato
+            let year = currentDate.getFullYear();
+            let month = currentDate.getMonth(); 
+            let day = currentDate.getDate();
+
+            let holidayName = null;
+
+            // Festività Nazionali Fisse
+            const fixedHolidays = [
+                {m: 0, d: 1, name: "Capodanno (1° Gennaio)"},
+                {m: 0, d: 6, name: "Epifania (6 Gennaio)"},
+                {m: 3, d: 25, name: "Festa della Liberazione (25 Aprile)"},
+                {m: 4, d: 1, name: "Festa dei Lavoratori (1° Maggio)"},
+                {m: 5, d: 2, name: "Festa della Repubblica (2 Giugno)"},
+                {m: 7, d: 15, name: "Ferragosto (15 Agosto)"},
+                {m: 9, d: 4, name: "Giornata dell'Unità Nazionale (4 Novembre)"},
+                {m: 10, d: 1, name: "Tutti i Santi (1° Novembre)"},
+                {m: 11, d: 8, name: "Immacolata Concezione (8 Dicembre)"},
+                {m: 11, d: 25, name: "Natale (25 Dicembre)"},
+                {m: 11, d: 26, name: "Santo Stefano (26 Dicembre)"}
+            ];
+
+            for (let h of fixedHolidays) {
+                if (month === h.m && day === h.d) {
+                    holidayName = h.name;
+                    break;
+                }
+            }
+
+            // Calcolo Pasqua e Pasquetta (Algoritmo di Gauss)
+            let a = year % 19,
+                b = Math.floor(year / 100),
+                c = year % 100,
+                d = Math.floor(b / 4),
+                e = b % 4,
+                f = Math.floor((b + 8) / 25),
+                g = Math.floor((b - f + 1) / 3),
+                h_g = (19 * a + b - d - g + 15) % 30,
+                i = Math.floor(c / 4),
+                k = c % 4,
+                L = (32 + 2 * e + 2 * i - h_g - k) % 7,
+                m = Math.floor((a + 11 * h_g + 22 * L) / 451),
+                monthPasqua = Math.floor((h_g + L - 7 * m + 114) / 31) - 1,
+                dayPasqua = ((h_g + L - 7 * m + 114) % 31) + 1;
+            
+            let datePasqua = new Date(year, monthPasqua, dayPasqua);
+            let datePasquetta = new Date(year, monthPasqua, dayPasqua + 1);
+
+            if (currentDate.getTime() === datePasqua.getTime()) {
+                holidayName = "Pasqua";
+            } else if (currentDate.getTime() === datePasquetta.getTime()) {
+                holidayName = "Lunedì dell'Angelo / Pasquetta";
+            }
+
+            // Verifica se è festivo o weekend
+            if (holidayName) {
+                let note = holidayName;
+                if (dayOfWeek === 0) {
+                    note += " (Cadendo di domenica, dà diritto al trattamento economico aggiuntivo come previsto da CCNL)";
+                }
+                holidaysFound.push({
+                    date: new Date(currentDate).toLocaleDateString('it-IT'),
+                    description: note
+                });
+            }
+
+            // Conta se non è sabato (6), domenica (0) e non è festivo
+            if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidayName) {
+                workingDays++;
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        const resultDiv = document.getElementById('calcResult');
+        resultDiv.style.display = 'block';
+        
+        let htmlContent = `<strong>📊 Risultato del Calcolo:</strong><br>`;
+        htmlContent += `Giorni lavorativi effettivi: <strong>${workingDays}</strong><br>`;
+        htmlContent += `Festività nazionali/contrattuali nel periodo: <strong>${holidaysFound.length}</strong>`;
+        
+        if (holidaysFound.length > 0) {
+            htmlContent += `<ul>`;
+            for (let hol of holidaysFound) {
+                htmlContent += `<li><strong>${hol.date}</strong>: ${hol.description}</li>`;
+            }
+            htmlContent += `</ul>`;
+        }
+        
+        resultDiv.innerHTML = htmlContent;
+    }
+</script>
+
+</body>
+</html>
